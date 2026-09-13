@@ -14,6 +14,8 @@ class WeatherStatus extends StatefulWidget {
 class _WeatherStatusState extends State<WeatherStatus> {
   double? _temperature;
   String _weatherText = 'Hava durumu';
+  IconData _weatherIcon = Icons.cloud_outlined;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -23,18 +25,21 @@ class _WeatherStatusState extends State<WeatherStatus> {
 
   Future<void> _loadWeather() async {
     try {
-      final permission = await Geolocator.checkPermission();
+      var permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
-        final requested = await Geolocator.requestPermission();
-
-        if (requested == LocationPermission.denied ||
-            requested == LocationPermission.deniedForever) {
-          return;
-        }
+        permission = await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.deniedForever) {
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          setState(() {
+            _weatherText = 'Konum yok';
+            _weatherIcon = Icons.location_off_outlined;
+            _loading = false;
+          });
+        }
         return;
       }
 
@@ -45,89 +50,120 @@ class _WeatherStatusState extends State<WeatherStatus> {
         '?latitude=${position.latitude}'
         '&longitude=${position.longitude}'
         '&current=temperature_2m,weather_code'
-        '&temperature_unit=celsius',
+        '&timezone=auto',
       );
 
       final response = await http.get(url);
 
-      if (response.statusCode != 200) return;
+      if (response.statusCode != 200) {
+        throw Exception('Hava durumu alınamadı');
+      }
 
       final data = jsonDecode(response.body);
 
-      final current = data['current'];
-
       final temperature =
-          (current['temperature_2m'] as num).toDouble();
+          (data['current']['temperature_2m'] as num).toDouble();
+
+      final weatherCode =
+          (data['current']['weather_code'] as num).toInt();
 
       if (!mounted) return;
 
       setState(() {
         _temperature = temperature;
-        _weatherText = _weatherDescription(
-          current['weather_code'] as num,
-        );
+        _weatherText = _weatherDescription(weatherCode);
+        _weatherIcon = _weatherIconForCode(weatherCode);
+        _loading = false;
       });
     } catch (_) {
-      // Hava durumu alınamazsa arayüz çalışmaya devam eder.
+      if (!mounted) return;
+
+      setState(() {
+        _weatherText = 'Hava durumu';
+        _weatherIcon = Icons.cloud_outlined;
+        _loading = false;
+      });
     }
   }
 
-  String _weatherDescription(num code) {
-    final value = code.toInt();
+  String _weatherDescription(int code) {
+    if (code == 0) return 'Açık';
+    if (code <= 3) return 'Parçalı bulutlu';
+    if (code <= 48) return 'Sisli';
+    if (code <= 57) return 'Çiseleme';
+    if (code <= 67) return 'Yağmurlu';
+    if (code <= 77) return 'Karlı';
+    if (code <= 82) return 'Sağanak';
+    if (code <= 86) return 'Kar sağanağı';
+    if (code >= 95) return 'Fırtınalı';
 
-    if (value == 0) return 'Açık';
-    if (value <= 3) return 'Parçalı bulutlu';
-    if (value <= 48) return 'Sisli';
-    if (value <= 67) return 'Yağmurlu';
-    if (value <= 77) return 'Karlı';
-    if (value <= 82) return 'Sağanak';
-    if (value <= 86) return 'Kar yağışı';
-    return 'Fırtınalı';
+    return 'Hava durumu';
+  }
+
+  IconData _weatherIconForCode(int code) {
+    if (code == 0) {
+      return Icons.wb_sunny_outlined;
+    }
+
+    if (code <= 3) {
+      return Icons.cloud_outlined;
+    }
+
+    if (code <= 48) {
+      return Icons.foggy;
+    }
+
+    if (code <= 57) {
+      return Icons.grain;
+    }
+
+    if (code <= 67) {
+      return Icons.water_drop_outlined;
+    }
+
+    if (code <= 77) {
+      return Icons.ac_unit;
+    }
+
+    if (code <= 82) {
+      return Icons.umbrella_outlined;
+    }
+
+    if (code <= 86) {
+      return Icons.ac_unit;
+    }
+
+    if (code >= 95) {
+      return Icons.thunderstorm_outlined;
+    }
+
+    return Icons.cloud_outlined;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_temperature == null) {
-      return const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.cloud,
-            color: Colors.white,
-            size: 28,
-          ),
-          SizedBox(width: 6),
-          Text(
-            'Hava durumu',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-            ),
-          ),
-        ],
+    if (_loading) {
+      return const Text(
+        'Hava durumu',
+        style: TextStyle(
+          color: Colors.white,
+        ),
       );
     }
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(
-          Icons.cloud,
+        Icon(
+          _weatherIcon,
           color: Colors.white,
-          size: 28,
+          size: 22,
         ),
         const SizedBox(width: 6),
         Text(
-          '${_temperature!.round()}°C',
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          _weatherText,
+          _temperature == null
+              ? _weatherText
+              : '${_temperature!.round()}°  $_weatherText',
           style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
