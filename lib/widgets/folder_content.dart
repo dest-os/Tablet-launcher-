@@ -259,4 +259,146 @@ class _AppSelectorDialogState extends State<_AppSelectorDialog> {
   void initState() {
     super.initState();
 
-    _filteredApps = List<AppInfo>.from(widget
+    _filteredApps = List<AppInfo>.from(widget.apps);
+
+    _searchController.addListener(_filterApps);
+  }
+
+  void _filterApps() {
+    final query = _searchController.text.trim().toLowerCase();
+
+    setState(() {
+      if (query.isEmpty) {
+        _filteredApps = List<AppInfo>.from(widget.apps);
+        return;
+      }
+
+      _filteredApps = widget.apps.where((app) {
+        return app.name.toLowerCase().contains(query);
+      }).toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_filterApps);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color(0xFF20252B),
+      title: const Text(
+        'Uygulama Ekle',
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      content: SizedBox(
+        width: 600,
+        height: 500,
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              style: const TextStyle(
+                color: Colors.white,
+              ),
+              decoration: InputDecoration(
+                hintText: 'Uygulama ara',
+                hintStyle: const TextStyle(
+                  color: Colors.white54,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search,
+                  color: Colors.white70,
+                ),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          _searchController.clear();
+                        },
+                        icon: const Icon(
+                          Icons.clear,
+                          color: Colors.white70,
+                        ),
+                      )
+                    : null,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Colors.white24,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF00BFFF),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: _filteredApps.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'Uygulama bulunamadı.',
+                        style: TextStyle(
+                          color: Colors.white70,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: _filteredApps.length,
+                      itemBuilder: (context, index) {
+                        final app = _filteredApps[index];
+
+                        return ListTile(
+                          leading: app.icon != null
+                              ? Image.memory(
+                                  app.icon!,
+                                  width: 42,
+                                  height: 42,
+                                  fit: BoxFit.contain,
+                                )
+                              : const Icon(
+                                  Icons.apps,
+                                  color: Colors.white,
+                                  size: 36,
+                                ),
+                          title: Text(
+                            app.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.of(context).pop(app);
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'İptal',
+            style: TextStyle(
+              color: Colors.white70,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
