@@ -22,7 +22,7 @@ jobs:
 
       - name: Fix Gradle distribution URL
         run: |
-          sed -i 's#https://github.com/gradle/gradle-distributions/releases/download#https://services.gradle.org/distributions#' gradle/wrapper/gradle-wrapper.properties
+          sed -i 's#https://github.com/gradle/gradle-distributions/releases/download#https://services.gradle.org/distributions#' android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Flutter pub get
         run: flutter pub get
