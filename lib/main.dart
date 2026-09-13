@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'widgets/status_panel.dart';
 
 void main() {
   runApp(const DestOsAresLauncher());
@@ -29,15 +30,25 @@ class AresHomeScreen extends StatelessWidget {
     return const Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Center(
-          child: Text(
-            'DEST-OS ARES',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: StatusPanel(),
             ),
-          ),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'DEST-OS ARES',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
