@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'widgets/status_panel.dart';
+
+import 'screens/ares_home_screen.dart';
 
 void main() {
   runApp(const DestOsAresLauncher());
@@ -18,39 +19,6 @@ class DestOsAresLauncher extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
       ),
       home: const AresHomeScreen(),
-    );
-  }
-}
-
-class AresHomeScreen extends StatelessWidget {
-  const AresHomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: StatusPanel(),
-            ),
-            Expanded(
-              child: Center(
-                child: Text(
-                  'DEST-OS ARES',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
