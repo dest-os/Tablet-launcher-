@@ -19,6 +19,7 @@ dependencies:
   http: ^1.6.0
   intl: ^0.20.3
   installed_apps: ^2.1.1
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
