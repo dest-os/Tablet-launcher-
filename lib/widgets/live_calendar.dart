@@ -27,13 +27,13 @@ class _LiveCalendarState extends State<LiveCalendar> {
   ];
 
   final List<String> _weekDays = const [
-    'P',
-    'S',
-    'Ç',
-    'P',
-    'C',
-    'C',
-    'P',
+    'Pzt',
+    'Sal',
+    'Çar',
+    'Per',
+    'Cum',
+    'Cmt',
+    'Paz',
   ];
 
   @override
@@ -82,6 +82,70 @@ class _LiveCalendarState extends State<LiveCalendar> {
     });
   }
 
+  void _showYearPicker() {
+    final currentYear = _displayedMonth.year;
+
+    showDialog<void>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF20252B),
+          title: const Text(
+            'Yıl Seç',
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+          content: SizedBox(
+            width: 300,
+            height: 350,
+            child: ListView.builder(
+              itemCount: 101,
+              itemBuilder: (context, index) {
+                final year = currentYear - 50 + index;
+                final isSelected = year == currentYear;
+
+                return ListTile(
+                  title: Text(
+                    '$year',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isSelected
+                          ? const Color(0xFF00BFFF)
+                          : Colors.white,
+                      fontSize: 18,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _displayedMonth = DateTime(
+                        year,
+                        _displayedMonth.month,
+                      );
+
+                      if (_selectedDate.year == currentYear) {
+                        _selectedDate = DateTime(
+                          year,
+                          _selectedDate.month,
+                          _selectedDate.day,
+                        );
+                      }
+                    });
+
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   int _daysInMonth() {
     return DateTime(
       _displayedMonth.year,
@@ -122,13 +186,16 @@ class _LiveCalendarState extends State<LiveCalendar> {
                 color: Colors.white,
                 iconSize: 22,
               ),
-              Text(
-                '${_monthNames[_displayedMonth.month - 1]} '
-                '${_displayedMonth.year}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+              GestureDetector(
+                onTap: _showYearPicker,
+                child: Text(
+                  '${_monthNames[_displayedMonth.month - 1]} '
+                  '${_displayedMonth.year}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               IconButton(
@@ -149,7 +216,7 @@ class _LiveCalendarState extends State<LiveCalendar> {
                       day,
                       style: const TextStyle(
                         color: Colors.white70,
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
