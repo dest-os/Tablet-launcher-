@@ -15,29 +15,33 @@ class _ConnectivityStatusState extends State<ConnectivityStatus> {
 
   StreamSubscription<List<ConnectivityResult>>? _subscription;
 
-  bool _isConnected = false;
+  bool _isWifiConnected = false;
 
   @override
   void initState() {
     super.initState();
+
     _checkConnectivity();
 
-    _subscription = _connectivity.onConnectivityChanged.listen((results) {
-      _updateConnectionStatus(results);
-    });
+    _subscription = _connectivity.onConnectivityChanged.listen(
+      _updateConnectionStatus,
+    );
   }
 
   Future<void> _checkConnectivity() async {
     final results = await _connectivity.checkConnectivity();
+
     _updateConnectionStatus(results);
   }
 
-  void _updateConnectionStatus(List<ConnectivityResult> results) {
+  void _updateConnectionStatus(
+    List<ConnectivityResult> results,
+  ) {
     if (!mounted) return;
 
     setState(() {
-      _isConnected = results.any(
-        (result) => result != ConnectivityResult.none,
+      _isWifiConnected = results.contains(
+        ConnectivityResult.wifi,
       );
     });
   }
@@ -51,7 +55,7 @@ class _ConnectivityStatusState extends State<ConnectivityStatus> {
   @override
   Widget build(BuildContext context) {
     return Icon(
-      _isConnected ? Icons.wifi : Icons.wifi_off,
+      _isWifiConnected ? Icons.wifi : Icons.wifi_off,
       color: Colors.white,
       size: 28,
     );
