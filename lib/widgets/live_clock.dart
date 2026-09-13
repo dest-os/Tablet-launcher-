@@ -13,7 +13,7 @@ class _LiveClockState extends State<LiveClock> {
   late DateTime _now;
   Timer? _timer;
 
-  final List<String> _weekDays = const [
+  final List<String> _dayNames = const [
     'Pazartesi',
     'Salı',
     'Çarşamba',
@@ -66,8 +66,8 @@ class _LiveClockState extends State<LiveClock> {
     return '$day.$month.$year';
   }
 
-  String _formatWeekDay() {
-    return _weekDays[_now.weekday - 1];
+  String _formatDay() {
+    return _dayNames[_now.weekday - 1];
   }
 
   @override
@@ -96,7 +96,7 @@ class _LiveClockState extends State<LiveClock> {
         ),
         const SizedBox(height: 2),
         Text(
-          _formatWeekDay(),
+          _formatDay(),
           style: const TextStyle(
             color: Colors.white70,
             fontSize: 14,
