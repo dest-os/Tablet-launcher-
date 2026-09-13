@@ -13,6 +13,16 @@ class _LiveClockState extends State<LiveClock> {
   late DateTime _now;
   Timer? _timer;
 
+  final List<String> _weekDays = const [
+    'Pazartesi',
+    'Salı',
+    'Çarşamba',
+    'Perşembe',
+    'Cuma',
+    'Cumartesi',
+    'Pazar',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +66,10 @@ class _LiveClockState extends State<LiveClock> {
     return '$day.$month.$year';
   }
 
+  String _formatWeekDay() {
+    return _weekDays[_now.weekday - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -78,6 +92,15 @@ class _LiveClockState extends State<LiveClock> {
             fontSize: 16,
             fontWeight: FontWeight.w400,
             letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          _formatWeekDay(),
+          style: const TextStyle(
+            color: Colors.white70,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ],
