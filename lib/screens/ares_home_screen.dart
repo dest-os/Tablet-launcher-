@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/ares_background.dart';
+
 class AresHomeScreen extends StatelessWidget {
   const AresHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: Colors.black,
-      body: SizedBox.expand(
-        child: Center(
-          child: Text(
-            'DEST-OS ARES',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
+      body: Center(
+        child: AspectRatio(
+          aspectRatio: 3 / 2,
+          child: Stack(
+            fit: StackFit.expand,
+            children: const [
+              AresBackground(),
+            ],
           ),
         ),
       ),
