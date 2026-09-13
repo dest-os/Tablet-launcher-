@@ -6,9 +6,55 @@ import '../widgets/live_calendar.dart';
 import '../widgets/weather_status.dart';
 import '../widgets/connectivity_status.dart';
 import '../widgets/battery_status.dart';
+import '../widgets/folder_content.dart';
 
 class AresHomeScreen extends StatelessWidget {
   const AresHomeScreen({super.key});
+
+  void _openFolder(
+    BuildContext context,
+    String folderName,
+  ) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.75),
+      builder: (context) {
+        return Dialog(
+          backgroundColor: const Color(0xFF10151B),
+          insetPadding: const EdgeInsets.all(40),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: SizedBox(
+            width: 900,
+            height: 600,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: FolderContent(
+                folderName: folderName,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _folderArea(
+    BuildContext context,
+    String folderName,
+  ) {
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: () {
+        _openFolder(
+          context,
+          folderName,
+        );
+      },
+      child: const SizedBox.expand(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +123,102 @@ class AresHomeScreen extends StatelessWidget {
                     height: height * 0.075,
                     child: const Center(
                       child: BatteryStatus(),
+                    ),
+                  ),
+
+                  // SOSYAL
+                  Positioned(
+                    left: width * 0.035,
+                    top: height * 0.700,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'SOSYAL',
+                    ),
+                  ),
+
+                  // OYUNLAR
+                  Positioned(
+                    left: width * 0.275,
+                    top: height * 0.700,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'OYUNLAR',
+                    ),
+                  ),
+
+                  // MEDYA
+                  Positioned(
+                    left: width * 0.515,
+                    top: height * 0.700,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'MEDYA',
+                    ),
+                  ),
+
+                  // ARAÇLAR
+                  Positioned(
+                    left: width * 0.755,
+                    top: height * 0.700,
+                    width: width * 0.210,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'ARAÇLAR',
+                    ),
+                  ),
+
+                  // İŞ
+                  Positioned(
+                    left: width * 0.035,
+                    top: height * 0.835,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'İŞ',
+                    ),
+                  ),
+
+                  // SİSTEM
+                  Positioned(
+                    left: width * 0.275,
+                    top: height * 0.835,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'SİSTEM',
+                    ),
+                  ),
+
+                  // İNTERNET
+                  Positioned(
+                    left: width * 0.515,
+                    top: height * 0.835,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'İNTERNET',
+                    ),
+                  ),
+
+                  // DİĞER
+                  Positioned(
+                    left: width * 0.755,
+                    top: height * 0.835,
+                    width: width * 0.210,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'DİĞER',
                     ),
                   ),
                 ],
