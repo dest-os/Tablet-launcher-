@@ -71,14 +71,14 @@ class _BatteryStatusState extends State<BatteryStatus> {
       children: [
         Icon(
           _batteryIcon(),
-          color: Colors.white,
+          color: const Color(0xFF00BFFF),
           size: 28,
         ),
         const SizedBox(width: 6),
         Text(
           '$_batteryLevel%',
           style: const TextStyle(
-            color: Colors.white,
+            color: const Color(0xFF00BFFF),
             fontSize: 18,
             fontWeight: FontWeight.w500,
           ),
