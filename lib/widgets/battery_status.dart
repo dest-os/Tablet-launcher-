@@ -71,10 +71,13 @@ class _BatteryStatusState extends State<BatteryStatus> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-          _batteryIcon(),
-          color: const Color(0xFF00BFFF),
-          size: 30,
+        Transform.rotate(
+          angle: 1.5708,
+          child: Icon(
+            _batteryIcon(),
+            color: const Color(0xFF00BFFF),
+            size: 30,
+          ),
         ),
         const SizedBox(width: 8),
         Text(
