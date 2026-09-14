@@ -174,13 +174,13 @@ class _LiveCalendarState extends State<LiveCalendar> {
 
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: 4,
-        vertical: 6,
+        horizontal: 2,
+        vertical: 4,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // AY / YIL BAŞLIĞI
+          // AY / YIL
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -221,26 +221,21 @@ class _LiveCalendarState extends State<LiveCalendar> {
             ],
           ),
 
-          const SizedBox(height: 7),
+          const SizedBox(height: 5),
 
           // HAFTANIN GÜNLERİ
           Row(
             children: _weekDays.map(
               (day) {
                 return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 3,
-                    ),
-                    child: Center(
-                      child: Text(
-                        day,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
+                  child: Center(
+                    child: Text(
+                      day,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -249,9 +244,9 @@ class _LiveCalendarState extends State<LiveCalendar> {
             ).toList(),
           ),
 
-          const SizedBox(height: 7),
+          const SizedBox(height: 5),
 
-          // TAKVİM GÜNLERİ
+          // RAKAMLAR
           for (int row = 0; row < rowCount; row++)
             Row(
               children: List.generate(
@@ -263,7 +258,7 @@ class _LiveCalendarState extends State<LiveCalendar> {
                   if (day < 1 || day > daysInMonth) {
                     return const Expanded(
                       child: SizedBox(
-                        height: 31,
+                        height: 30,
                       ),
                     );
                   }
@@ -274,29 +269,29 @@ class _LiveCalendarState extends State<LiveCalendar> {
                       _selectedDate.day == day;
 
                   return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 2,
-                        vertical: 1,
-                      ),
-                      child: GestureDetector(
-                        onTap: () => _selectDate(day),
-                        child: Container(
-                          height: 31,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isSelected
-                                ? const Color(0xFF00BFFF)
-                                : Colors.transparent,
-                          ),
-                          child: Center(
+                    child: SizedBox(
+                      height: 30,
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: () => _selectDate(day),
+                          child: Container(
+                            width: 27,
+                            height: 27,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isSelected
+                                  ? const Color(0xFF00BFFF)
+                                  : Colors.transparent,
+                            ),
                             child: Text(
                               '$day',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: isSelected
                                     ? Colors.black
                                     : Colors.white,
-                                fontSize: 14,
+                                fontSize: 16,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.normal,
