@@ -115,8 +115,8 @@ class AresHomeScreen extends StatelessWidget {
 
                 // SAĞ ÜST CANLI DURUM GRUBU
                 Positioned(
-                  left: 1295,
-                  top: 34,
+                  left: 1315,
+                  top: 39,
                   width: 300,
                   height: 58,
                   child: const FittedBox(
