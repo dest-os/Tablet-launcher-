@@ -6,7 +6,7 @@ class InstalledAppsService {
 
   Future<List<AppInfo>> getLaunchableApps() async {
     final apps = await InstalledApps.getInstalledApps(
-      excludeSystemApps: true,
+      excludeSystemApps: false,
       excludeNonLaunchableApps: true,
       withIcon: true,
     );
