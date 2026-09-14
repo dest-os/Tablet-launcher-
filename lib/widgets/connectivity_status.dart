@@ -54,10 +54,29 @@ class _ConnectivityStatusState extends State<ConnectivityStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      _isWifiConnected ? Icons.wifi : Icons.wifi_off,
-      color: Colors.white,
-      size: 28,
+    const iconColor = Color(0xFF00BFFF);
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          _isWifiConnected ? Icons.wifi : Icons.wifi_off,
+          color: iconColor,
+          size: 27,
+        ),
+        const SizedBox(width: 13),
+        const Icon(
+          Icons.bluetooth,
+          color: iconColor,
+          size: 27,
+        ),
+        const SizedBox(width: 13),
+        const Icon(
+          Icons.signal_cellular_alt,
+          color: iconColor,
+          size: 27,
+        ),
+      ],
     );
   }
 }
