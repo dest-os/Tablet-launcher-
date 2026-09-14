@@ -17,6 +17,7 @@ class _BatteryStatusState extends State<BatteryStatus> {
   @override
   void initState() {
     super.initState();
+
     _loadBatteryInfo();
 
     _battery.onBatteryStateChanged.listen((state) {
@@ -68,18 +69,22 @@ class _BatteryStatusState extends State<BatteryStatus> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Icon(
-          _batteryIcon(),
-          color: const Color(0xFF00BFFF),
-          size: 28,
+        Transform.rotate(
+          angle: 1.5708,
+          child: Icon(
+            _batteryIcon(),
+            color: const Color(0xFF00BFFF),
+            size: 30,
+          ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 8),
         Text(
           '$_batteryLevel%',
           style: const TextStyle(
-            color: const Color(0xFF00BFFF),
-            fontSize: 18,
+            color: Color(0xFF00BFFF),
+            fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
         ),
