@@ -173,24 +173,15 @@ class _LiveCalendarState extends State<LiveCalendar> {
     final rowCount = (totalCells / 7).ceil();
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 2,
-        vertical: 4,
-      ),
+      padding: const EdgeInsets.all(8),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // AY / YIL
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
                 onPressed: _previousMonth,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 30,
-                  minHeight: 30,
-                ),
                 icon: const Icon(Icons.chevron_left),
                 color: Colors.white,
                 iconSize: 22,
@@ -202,40 +193,38 @@ class _LiveCalendarState extends State<LiveCalendar> {
                   '${_displayedMonth.year}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
+                    fontSize: 19,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
               IconButton(
                 onPressed: _nextMonth,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(
-                  minWidth: 30,
-                  minHeight: 30,
-                ),
                 icon: const Icon(Icons.chevron_right),
                 color: Colors.white,
                 iconSize: 22,
               ),
             ],
           ),
-
-          const SizedBox(height: 5),
+          const SizedBox(height: 2),
 
           // HAFTANIN GÜNLERİ
           Row(
             children: _weekDays.map(
               (day) {
                 return Expanded(
-                  child: Center(
-                    child: Text(
-                      day,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2),
+                    child: Center(
+                      child: Text(
+                        day,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white70,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                   ),
@@ -244,9 +233,9 @@ class _LiveCalendarState extends State<LiveCalendar> {
             ).toList(),
           ),
 
-          const SizedBox(height: 5),
+          const SizedBox(height: 2),
 
-          // RAKAMLAR
+          // TAKVİM RAKAMLARI
           for (int row = 0; row < rowCount; row++)
             Row(
               children: List.generate(
@@ -258,7 +247,7 @@ class _LiveCalendarState extends State<LiveCalendar> {
                   if (day < 1 || day > daysInMonth) {
                     return const Expanded(
                       child: SizedBox(
-                        height: 30,
+                        height: 32,
                       ),
                     );
                   }
@@ -269,33 +258,32 @@ class _LiveCalendarState extends State<LiveCalendar> {
                       _selectedDate.day == day;
 
                   return Expanded(
-                    child: SizedBox(
-                      height: 30,
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () => _selectDate(day),
-                          child: Container(
-                            width: 27,
-                            height: 27,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
+                    child: GestureDetector(
+                      onTap: () => _selectDate(day),
+                      child: Container(
+                        height: 32,
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 1,
+                          vertical: 1,
+                        ),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isSelected
+                              ? const Color(0xFF00BFFF)
+                              : Colors.transparent,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '$day',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
                               color: isSelected
-                                  ? const Color(0xFF00BFFF)
-                                  : Colors.transparent,
-                            ),
-                            child: Text(
-                              '$day',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.black
-                                    : Colors.white,
-                                fontSize: 16,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontSize: 16,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                           ),
                         ),
