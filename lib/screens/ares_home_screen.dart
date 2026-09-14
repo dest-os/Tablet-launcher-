@@ -113,30 +113,23 @@ class AresHomeScreen extends StatelessWidget {
                   ),
                 ),
 
-                // CANLI BAĞLANTI DURUMU
+                // SAĞ ÜST CANLI DURUM GRUBU
                 Positioned(
-                  left: designWidth * 0.765,
-                  top: designHeight * 0.035,
-                  width: designWidth * 0.125,
-                  height: designHeight * 0.075,
-                  child: const Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: ConnectivityStatus(),
-                    ),
-                  ),
-                ),
-
-                // CANLI BATARYA
-                Positioned(
-                  left: designWidth * 0.900,
-                  top: designHeight * 0.035,
-                  width: designWidth * 0.075,
-                  height: designHeight * 0.075,
-                  child: const Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: BatteryStatus(),
+                  left: 1185,
+                  top: 34,
+                  width: 300,
+                  height: 58,
+                  child: const FittedBox(
+                    fit: BoxFit.contain,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ConnectivityStatus(),
+                        SizedBox(width: 24),
+                        BatteryStatus(),
+                      ],
                     ),
                   ),
                 ),
@@ -213,7 +206,7 @@ class AresHomeScreen extends StatelessWidget {
                   child: _folderArea(context, 'DİĞER'),
                 ),
 
-                // Gerçek Android gezinme kontrolleri sistem tarafından gösterilir.
+                // GERÇEK ANDROID GEZİNME KONTROLLERİ
                 const Positioned(
                   left: 0,
                   right: 0,
