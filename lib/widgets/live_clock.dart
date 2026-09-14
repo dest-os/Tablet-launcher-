@@ -83,7 +83,7 @@ class _LiveClockState extends State<LiveClock> {
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Center(
         child: Transform.translate(
-          offset: const Offset(0, 5),
+          offset: const Offset(3, 8),
           child: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.center,
