@@ -56,206 +56,254 @@ class AresHomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _panelCover({
+    required double left,
+    required double top,
+    required double width,
+    required double height,
+    double radius = 4,
+  }) {
+    return Positioned(
+      left: left,
+      top: top,
+      width: width,
+      height: height,
+      child: IgnorePointer(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(radius),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ARES tasarımı 1672x941'lik tek bir referans koordinat sisteminde
-    // hazırlanmıştır. Tüm arayüzü tek parça olarak ölçeklemek; saat,
-    // takvim, hava durumu ve dokunma alanlarının birbirinden kaymasını
-    // ekran oranından bağımsız olarak engeller.
-    const designWidth = 1672.0;
-    const designHeight = 941.0;
-
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SizedBox.expand(
-        child: FittedBox(
-          fit: BoxFit.fill,
-          alignment: Alignment.center,
-          child: SizedBox(
-            width: designWidth,
-            height: designHeight,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                const AresBackground(),
+      body: Center(
+        child: AspectRatio(
+          aspectRatio: 3 / 2,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final width = constraints.maxWidth;
+              final height = constraints.maxHeight;
 
-                // CANLI SAAT / TARİH / GÜN
-                Positioned(
-                  left: designWidth * 0.035,
-                  top: designHeight * 0.055,
-                  width: designWidth * 0.285,
-                  height: designHeight * 0.075,
-                  child: const FittedBox(
-                    fit: BoxFit.contain,
-                    child: LiveClock(),
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  const AresBackground(),
+
+                  // Statik görseldeki canlı olarak değişecek metinlerin yalnızca
+                  // iç alanlarını temizle; çerçeveler ve diğer tasarım korunur.
+                  _panelCover(
+                    left: width * 0.050,
+                    top: height * 0.060,
+                    width: width * 0.260,
+                    height: height * 0.050,
                   ),
-                ),
-
-                // CANLI TAKVİM
-                Positioned(
-                  left: designWidth * 0.195,
-                  top: designHeight * 0.205,
-                  width: designWidth * 0.185,
-                  height: designHeight * 0.245,
-                  child: const FittedBox(
-                    fit: BoxFit.contain,
-                    child: LiveCalendar(),
+                  _panelCover(
+                    left: width * 0.205,
+                    top: height * 0.220,
+                    width: width * 0.155,
+                    height: height * 0.220,
                   ),
-                ),
+                  _panelCover(
+                    left: width * 0.645,
+                    top: height * 0.220,
+                    width: width * 0.180,
+                    height: height * 0.220,
+                  ),
+                  _panelCover(
+                    left: width * 0.775,
+                    top: height * 0.045,
+                    width: width * 0.195,
+                    height: height * 0.055,
+                  ),
 
-                // CANLI HAVA DURUMU
-                Positioned(
-                  left: designWidth * 0.635,
-                  top: designHeight * 0.205,
-                  width: designWidth * 0.205,
-                  height: designHeight * 0.245,
-                  child: const Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
+                  // CANLI SAAT / TARİH / GÜN
+                  Positioned(
+                    left: width * 0.050,
+                    top: height * 0.055,
+                    width: width * 0.260,
+                    height: height * 0.060,
+                    child: const Center(
+                      child: LiveClock(),
+                    ),
+                  ),
+
+                  // CANLI TAKVİM
+                  Positioned(
+                    left: width * 0.205,
+                    top: height * 0.220,
+                    width: width * 0.155,
+                    height: height * 0.220,
+                    child: const LiveCalendar(),
+                  ),
+
+                  // CANLI HAVA DURUMU
+                  Positioned(
+                    left: width * 0.645,
+                    top: height * 0.220,
+                    width: width * 0.180,
+                    height: height * 0.220,
+                    child: const Center(
                       child: WeatherStatus(),
                     ),
                   ),
-                ),
 
-                // CANLI BAĞLANTI DURUMU
-                Positioned(
-                  left: designWidth * 0.765,
-                  top: designHeight * 0.035,
-                  width: designWidth * 0.125,
-                  height: designHeight * 0.075,
-                  child: const Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
+                  // CANLI BAĞLANTI DURUMU
+                  Positioned(
+                    left: width * 0.775,
+                    top: height * 0.045,
+                    width: width * 0.125,
+                    height: height * 0.055,
+                    child: const Center(
                       child: ConnectivityStatus(),
                     ),
                   ),
-                ),
 
-                // CANLI BATARYA
-                Positioned(
-                  left: designWidth * 0.900,
-                  top: designHeight * 0.035,
-                  width: designWidth * 0.075,
-                  height: designHeight * 0.075,
-                  child: const Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
+                  // CANLI BATARYA
+                  Positioned(
+                    left: width * 0.905,
+                    top: height * 0.045,
+                    width: width * 0.065,
+                    height: height * 0.055,
+                    child: const Center(
                       child: BatteryStatus(),
                     ),
                   ),
-                ),
 
-                // SOSYAL
-                Positioned(
-                  left: designWidth * 0.035,
-                  top: designHeight * 0.700,
-                  width: designWidth * 0.215,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'SOSYAL'),
-                ),
+                  // SOSYAL
+                  Positioned(
+                    left: width * 0.035,
+                    top: height * 0.700,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'SOSYAL',
+                    ),
+                  ),
 
-                // ARES
-                Positioned(
-                  left: designWidth * 0.275,
-                  top: designHeight * 0.700,
-                  width: designWidth * 0.215,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'ARES'),
-                ),
+                  // ARES
+                  Positioned(
+                    left: width * 0.275,
+                    top: height * 0.700,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'ARES',
+                    ),
+                  ),
 
-                // MEDYA
-                Positioned(
-                  left: designWidth * 0.515,
-                  top: designHeight * 0.700,
-                  width: designWidth * 0.215,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'MEDYA'),
-                ),
+                  // MEDYA
+                  Positioned(
+                    left: width * 0.515,
+                    top: height * 0.700,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'MEDYA',
+                    ),
+                  ),
 
-                // ARAÇLAR
-                Positioned(
-                  left: designWidth * 0.755,
-                  top: designHeight * 0.700,
-                  width: designWidth * 0.210,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'ARAÇLAR'),
-                ),
+                  // ARAÇLAR
+                  Positioned(
+                    left: width * 0.755,
+                    top: height * 0.700,
+                    width: width * 0.210,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'ARAÇLAR',
+                    ),
+                  ),
 
-                // İŞ
-                Positioned(
-                  left: designWidth * 0.035,
-                  top: designHeight * 0.835,
-                  width: designWidth * 0.215,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'İŞ'),
-                ),
+                  // İŞ
+                  Positioned(
+                    left: width * 0.035,
+                    top: height * 0.835,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'İŞ',
+                    ),
+                  ),
 
-                // SİSTEM
-                Positioned(
-                  left: designWidth * 0.275,
-                  top: designHeight * 0.835,
-                  width: designWidth * 0.215,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'SİSTEM'),
-                ),
+                  // SİSTEM
+                  Positioned(
+                    left: width * 0.275,
+                    top: height * 0.835,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'SİSTEM',
+                    ),
+                  ),
 
-                // İNTERNET
-                Positioned(
-                  left: designWidth * 0.515,
-                  top: designHeight * 0.835,
-                  width: designWidth * 0.215,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'İNTERNET'),
-                ),
+                  // İNTERNET
+                  Positioned(
+                    left: width * 0.515,
+                    top: height * 0.835,
+                    width: width * 0.215,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'İNTERNET',
+                    ),
+                  ),
 
-                // DİĞER
-                Positioned(
-                  left: designWidth * 0.755,
-                  top: designHeight * 0.835,
-                  width: designWidth * 0.210,
-                  height: designHeight * 0.115,
-                  child: _folderArea(context, 'DİĞER'),
-                ),
+                  // DİĞER
+                  Positioned(
+                    left: width * 0.755,
+                    top: height * 0.835,
+                    width: width * 0.210,
+                    height: height * 0.115,
+                    child: _folderArea(
+                      context,
+                      'DİĞER',
+                    ),
+                  ),
 
-                // Gerçek Android gezinme kontrolleri sistem tarafından
-                // gösterilir; bu alan yalnızca onların altındaki ARES
-                // görünümünü sağlar. Tasarım ölçeğiyle birlikte ölçeklenir.
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  height: 38,
-                  child: IgnorePointer(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color(0xC7000000),
-                        border: Border(
-                          top: BorderSide(
-                            color: Color(0xFF00BFFF),
-                            width: 1.5,
+                  // GERÇEK ANDROID SİSTEM NAVİGASYON ALANI İÇİN ARES ÇERÇEVESİ
+                  // Buradaki ikonlar Flutter tarafından çizilmez; Android'in gerçek
+                  // Geri / Ana ekran / Son uygulamalar kontrolleri bu alanın üstünde
+                  // sistem tarafından gösterilir.
+                  Positioned(
+                    left: width * 0.355,
+                    right: width * 0.355,
+                    bottom: 2,
+                    height: 54,
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xCC031522),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: const Color(0xFF00BFFF),
+                            width: 2,
                           ),
-                          left: BorderSide(
-                            color: Color(0xFF0077A8),
-                            width: 1,
-                          ),
-                          right: BorderSide(
-                            color: Color(0xFF0077A8),
-                            width: 1,
-                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x9900BFFF),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0xFF00BFFF),
-                            blurRadius: 10,
-                            spreadRadius: 1,
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
         ),
       ),
