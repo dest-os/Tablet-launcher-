@@ -100,9 +100,9 @@ class _LiveCalendarState extends State<LiveCalendar> {
             width: 300,
             height: 350,
             child: ListView.builder(
-              itemCount: 101,
+              itemCount: 201,
               itemBuilder: (context, index) {
-                final year = currentYear - 50 + index;
+                final year = 1900 + index;
                 final isSelected = year == currentYear;
 
                 return ListTile(
@@ -126,11 +126,19 @@ class _LiveCalendarState extends State<LiveCalendar> {
                         _displayedMonth.month,
                       );
 
+                      final maxDay = DateTime(
+                        year,
+                        _displayedMonth.month + 1,
+                        0,
+                      ).day;
+
                       if (_selectedDate.year == currentYear) {
                         _selectedDate = DateTime(
                           year,
                           _selectedDate.month,
-                          _selectedDate.day,
+                          _selectedDate.day > maxDay
+                              ? maxDay
+                              : _selectedDate.day,
                         );
                       }
                     });
