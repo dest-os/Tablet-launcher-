@@ -177,28 +177,17 @@ class _FolderContentState extends State<FolderContent> {
 
     return Column(
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.folderName,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: IconButton(
+            onPressed: _showAppSelector,
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 28,
             ),
-            IconButton(
-              onPressed: _showAppSelector,
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
-                size: 28,
-              ),
-              tooltip: 'Uygulama ekle',
-            ),
-          ],
+            tooltip: 'Uygulama ekle',
+          ),
         ),
         const SizedBox(height: 8),
         Expanded(
