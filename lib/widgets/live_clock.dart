@@ -82,54 +82,57 @@ class _LiveClockState extends State<LiveClock> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Center(
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.access_time_rounded,
-                color: Color(0xFF00BFFF),
-                size: 32,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                _formatTime(),
-                style: const TextStyle(
-                  color: Color(0xFF168CFF),
-                  fontSize: 38,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 1,
+        child: Transform.translate(
+          offset: const Offset(0, 5),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.access_time_rounded,
+                  color: Color(0xFF00BFFF),
+                  size: 32,
                 ),
-              ),
-              const SizedBox(width: 10),
-              Container(
-                width: 2,
-                height: 34,
-                color: Color(0xFF00BFFF),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                _formatDate(),
-                style: const TextStyle(
-                  color: Color(0xFF00CFFF),
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(width: 10),
+                Text(
+                  _formatTime(),
+                  style: const TextStyle(
+                    color: Color(0xFF168CFF),
+                    fontSize: 38,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 1,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 14),
-              Text(
-                _formatDay(),
-                style: const TextStyle(
-                  color: Color(0xFF00CFFF),
-                  fontSize: 17,
-                  fontWeight: FontWeight.w500,
+                const SizedBox(width: 10),
+                Container(
+                  width: 2,
+                  height: 34,
+                  color: Color(0xFF00BFFF),
                 ),
-              ),
-            ],
+                const SizedBox(width: 12),
+                Text(
+                  _formatDate(),
+                  style: const TextStyle(
+                    color: Color(0xFF00CFFF),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Text(
+                  _formatDay(),
+                  style: const TextStyle(
+                    color: Color(0xFF00CFFF),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
