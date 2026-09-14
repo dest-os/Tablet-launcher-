@@ -177,17 +177,19 @@ class _FolderContentState extends State<FolderContent> {
 
     return Column(
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: IconButton(
-            onPressed: _showAppSelector,
-            icon: const Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 28,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              onPressed: _showAppSelector,
+              icon: const Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 28,
+              ),
+              tooltip: 'Uygulama ekle',
             ),
-            tooltip: 'Uygulama ekle',
-          ),
+          ],
         ),
         const SizedBox(height: 8),
         Expanded(
