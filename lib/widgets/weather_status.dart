@@ -148,17 +148,13 @@ class _WeatherStatusState extends State<WeatherStatus> {
   }
 
   String _weatherDescription(int code) {
-    if (code == 0) {
-      return 'Açık';
-    }
+    if (code == 0) return 'Açık';
 
     if (code == 1 || code == 2) {
       return 'Parçalı bulutlu';
     }
 
-    if (code == 3) {
-      return 'Kapalı';
-    }
+    if (code == 3) return 'Kapalı';
 
     if (code == 45 || code == 48) {
       return 'Sisli';
@@ -197,87 +193,121 @@ class _WeatherStatusState extends State<WeatherStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 330,
-      height: 175,
-      child: _loading
-          ? const Center(
-              child: SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Color(0xFF00BFFF),
-                ),
-              ),
-            )
-          : Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 8,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 92,
-                        height: 82,
-                        child: CustomPaint(
-                          painter: _WeatherPainter(
-                            code: _weatherCode,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
+
+        if (!width.isFinite || !height.isFinite) {
+          return const SizedBox.shrink();
+        }
+
+        final horizontalPadding = width * 0.045;
+        final verticalPadding = height * 0.055;
+
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: verticalPadding,
+          ),
+          child: _loading
+              ? const Center(
+                  child: SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFF00BFFF),
+                    ),
+                  ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(
+                      height: height * 0.22,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          _locationName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: const Color(0xFF00BFFF),
+                            fontSize: width * 0.052,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _locationName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF00BFFF),
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
+                    ),
+
+                    Expanded(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: width * 0.34,
+                            height: height * 0.58,
+                            child: CustomPaint(
+                              painter: _WeatherPainter(
+                                code: _weatherCode,
                               ),
                             ),
-                            const SizedBox(height: 5),
-                            if (_temperature != null)
-                              Text(
-                                '${_temperature!.round()}°C',
-                                maxLines: 1,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w700,
+                          ),
+
+                          SizedBox(
+                            width: width * 0.035,
+                          ),
+
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                              children: [
+                                if (_temperature != null)
+                                  FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      '${_temperature!.round()}°C',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: width * 0.09,
+                                        fontWeight:
+                                            FontWeight.w700,
+                                      ),
+                                    ),
+                                  ),
+                                SizedBox(
+                                  height: height * 0.025,
                                 ),
-                              ),
-                            const SizedBox(height: 3),
-                            Text(
-                              _weatherText,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Color(0xFF00BFFF),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    _weatherText,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color:
+                                          const Color(0xFF00BFFF),
+                                      fontSize: width * 0.052,
+                                      fontWeight:
+                                          FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+                    ),
+                  ],
+                ),
+        );
+      },
     );
   }
 }
@@ -285,27 +315,22 @@ class _WeatherStatusState extends State<WeatherStatus> {
 class _WeatherPainter extends CustomPainter {
   final int code;
 
-  _WeatherPainter({
+  const _WeatherPainter({
     required this.code,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(
-      size.width / 2,
-      size.height / 2,
-    );
-
     final scale = math.min(
-      size.width / 92,
-      size.height / 82,
+      size.width / 90,
+      size.height / 70,
     );
 
     canvas.save();
 
     canvas.translate(
-      center.dx,
-      center.dy,
+      size.width / 2,
+      size.height / 2,
     );
 
     canvas.scale(scale);
@@ -342,49 +367,41 @@ class _WeatherPainter extends CustomPainter {
   void _drawSunny(Canvas canvas) {
     final rayPaint = Paint()
       ..color = const Color(0xFF00BFFF)
-      ..strokeWidth = 3
+      ..strokeWidth = 2.8
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
-
-    const radius = 19.0;
 
     for (int i = 0; i < 8; i++) {
       final angle = i * math.pi / 4;
 
-      final start = Offset(
-        math.cos(angle) * 27,
-        math.sin(angle) * 27,
-      );
-
-      final end = Offset(
-        math.cos(angle) * 36,
-        math.sin(angle) * 36,
-      );
-
       canvas.drawLine(
-        start,
-        end,
+        Offset(
+          math.cos(angle) * 25,
+          math.sin(angle) * 25,
+        ),
+        Offset(
+          math.cos(angle) * 34,
+          math.sin(angle) * 34,
+        ),
         rayPaint,
       );
     }
 
     final sunPaint = Paint()
-      ..color = const Color(0xFF00BFFF)
-      ..style = PaintingStyle.fill;
+      ..color = const Color(0xFF00BFFF);
 
     canvas.drawCircle(
       Offset.zero,
-      radius,
+      19,
       sunPaint,
     );
 
     final innerPaint = Paint()
-      ..color = const Color(0xFF08131C)
-      ..style = PaintingStyle.fill;
+      ..color = const Color(0xFF08131C);
 
     canvas.drawCircle(
       Offset.zero,
-      radius - 6,
+      12,
       innerPaint,
     );
   }
@@ -392,50 +409,48 @@ class _WeatherPainter extends CustomPainter {
   void _drawPartlyCloudy(Canvas canvas) {
     _drawSun(
       canvas,
-      const Offset(-12, -13),
+      const Offset(-13, -12),
     );
 
     _drawCloud(
       canvas,
-      offset: const Offset(9, 10),
+      const Offset(9, 10),
     );
   }
 
   void _drawCloudy(Canvas canvas) {
     _drawCloud(
       canvas,
-      offset: Offset.zero,
+      Offset.zero,
     );
   }
 
   void _drawCloud(
-    Canvas canvas, {
-    required Offset offset,
-  }) {
-    final cloudPaint = Paint()
-      ..color = const Color(0xFFB9D5E5)
-      ..style = PaintingStyle.fill;
+    Canvas canvas,
+    Offset offset,
+  ) {
+    final darkPaint = Paint()
+      ..color = const Color(0xFF718B99);
 
-    final darkCloudPaint = Paint()
-      ..color = const Color(0xFF7894A3)
-      ..style = PaintingStyle.fill;
+    final lightPaint = Paint()
+      ..color = const Color(0xFFB9D5E5);
 
     canvas.drawCircle(
       Offset(
-        offset.dx - 17,
-        offset.dy + 9,
+        offset.dx - 18,
+        offset.dy + 8,
       ),
-      13,
-      darkCloudPaint,
+      12,
+      darkPaint,
     );
 
     canvas.drawCircle(
       Offset(
-        offset.dx + 5,
-        offset.dy + 7,
+        offset.dx + 3,
+        offset.dy + 4,
       ),
-      17,
-      cloudPaint,
+      18,
+      lightPaint,
     );
 
     canvas.drawCircle(
@@ -444,7 +459,7 @@ class _WeatherPainter extends CustomPainter {
         offset.dy + 10,
       ),
       13,
-      cloudPaint,
+      lightPaint,
     );
 
     canvas.drawOval(
@@ -456,7 +471,7 @@ class _WeatherPainter extends CustomPainter {
         width: 62,
         height: 25,
       ),
-      cloudPaint,
+      lightPaint,
     );
   }
 
@@ -464,37 +479,32 @@ class _WeatherPainter extends CustomPainter {
     Canvas canvas,
     Offset offset,
   ) {
-    final paint = Paint()
-      ..color = const Color(0xFF00BFFF)
-      ..style = PaintingStyle.fill;
+    final sunPaint = Paint()
+      ..color = const Color(0xFF00BFFF);
 
     canvas.drawCircle(
       offset,
-      15,
-      paint,
+      14,
+      sunPaint,
     );
 
     final rayPaint = Paint()
       ..color = const Color(0xFF00BFFF)
-      ..strokeWidth = 2.5
+      ..strokeWidth = 2.4
       ..strokeCap = StrokeCap.round;
 
     for (int i = 0; i < 8; i++) {
       final angle = i * math.pi / 4;
 
-      final start = Offset(
-        offset.dx + math.cos(angle) * 21,
-        offset.dy + math.sin(angle) * 21,
-      );
-
-      final end = Offset(
-        offset.dx + math.cos(angle) * 28,
-        offset.dy + math.sin(angle) * 28,
-      );
-
       canvas.drawLine(
-        start,
-        end,
+        Offset(
+          offset.dx + math.cos(angle) * 20,
+          offset.dy + math.sin(angle) * 20,
+        ),
+        Offset(
+          offset.dx + math.cos(angle) * 27,
+          offset.dy + math.sin(angle) * 27,
+        ),
         rayPaint,
       );
     }
@@ -502,16 +512,16 @@ class _WeatherPainter extends CustomPainter {
 
   void _drawRain(
     Canvas canvas, {
-    bool light = false,
+    required bool light,
   }) {
     _drawCloud(
       canvas,
-      offset: const Offset(0, -8),
+      const Offset(0, -8),
     );
 
     final rainPaint = Paint()
       ..color = const Color(0xFF00BFFF)
-      ..strokeWidth = 3
+      ..strokeWidth = 2.8
       ..strokeCap = StrokeCap.round;
 
     final count = light ? 3 : 4;
@@ -530,17 +540,17 @@ class _WeatherPainter extends CustomPainter {
   void _drawSnow(Canvas canvas) {
     _drawCloud(
       canvas,
-      offset: const Offset(0, -9),
+      const Offset(0, -8),
     );
 
     final snowPaint = Paint()
       ..color = Colors.white
-      ..strokeWidth = 2.5
+      ..strokeWidth = 2
       ..strokeCap = StrokeCap.round;
 
     for (int i = 0; i < 3; i++) {
       final x = -18.0 + i * 18;
-      const y = 27.0;
+      const y = 28.0;
 
       canvas.drawLine(
         Offset(x - 5, y),
@@ -571,7 +581,7 @@ class _WeatherPainter extends CustomPainter {
   void _drawFog(Canvas canvas) {
     final paint = Paint()
       ..color = const Color(0xFFB9D5E5)
-      ..strokeWidth = 4
+      ..strokeWidth = 3.5
       ..strokeCap = StrokeCap.round;
 
     canvas.drawLine(
@@ -602,21 +612,20 @@ class _WeatherPainter extends CustomPainter {
   void _drawStorm(Canvas canvas) {
     _drawCloud(
       canvas,
-      offset: const Offset(0, -10),
+      const Offset(0, -10),
     );
 
     final lightningPaint = Paint()
-      ..color = const Color(0xFF00BFFF)
-      ..style = PaintingStyle.fill;
+      ..color = const Color(0xFF00BFFF);
 
     final path = Path()
-      ..moveTo(5, 16)
-      ..lineTo(-5, 16)
-      ..lineTo(-13, 31)
-      ..lineTo(-3, 29)
+      ..moveTo(5, 15)
+      ..lineTo(-5, 15)
+      ..lineTo(-13, 30)
+      ..lineTo(-3, 28)
       ..lineTo(-8, 43)
-      ..lineTo(9, 23)
-      ..lineTo(0, 25)
+      ..lineTo(9, 22)
+      ..lineTo(0, 24)
       ..close();
 
     canvas.drawPath(
