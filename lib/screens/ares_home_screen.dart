@@ -105,11 +105,9 @@ class AresHomeScreen extends StatelessWidget {
                   top: designHeight * 0.205,
                   width: designWidth * 0.205,
                   height: designHeight * 0.245,
-                  child: const Center(
-                    child: FittedBox(
-                      fit: BoxFit.contain,
-                      child: WeatherStatus(),
-                    ),
+                  child: const Align(
+                    alignment: Alignment.center,
+                    child: WeatherStatus(),
                   ),
                 ),
 
