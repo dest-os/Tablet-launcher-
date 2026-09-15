@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -17,7 +18,7 @@ class _WeatherStatusState extends State<WeatherStatus> {
   String _locationName = 'Konum';
   String _weatherText = 'Hava durumu';
 
-  int _weatherCode = -1;
+  int _weatherCode = 3;
 
   bool _loading = true;
 
@@ -37,14 +38,15 @@ class _WeatherStatusState extends State<WeatherStatus> {
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        if (mounted) {
-          setState(() {
-            _locationName = 'Konum yok';
-            _weatherText = 'Konum izni gerekli';
-            _weatherCode = -1;
-            _loading = false;
-          });
-        }
+        if (!mounted) return;
+
+        setState(() {
+          _locationName = 'Konum yok';
+          _weatherText = 'Konum izni gerekli';
+          _weatherCode = -1;
+          _loading = false;
+        });
+
         return;
       }
 
@@ -71,11 +73,13 @@ class _WeatherStatusState extends State<WeatherStatus> {
 
       final data = jsonDecode(response.body);
 
+      final current = data['current'];
+
       final temperature =
-          (data['current']['temperature_2m'] as num).toDouble();
+          (current['temperature_2m'] as num).toDouble();
 
       final weatherCode =
-          (data['current']['weather_code'] as num).toInt();
+          (current['weather_code'] as num).toInt();
 
       if (!mounted) return;
 
@@ -90,7 +94,7 @@ class _WeatherStatusState extends State<WeatherStatus> {
 
       setState(() {
         _weatherText = 'Hava durumu';
-        _weatherCode = -1;
+        _weatherCode = 3;
         _loading = false;
       });
     }
@@ -140,7 +144,7 @@ class _WeatherStatusState extends State<WeatherStatus> {
         });
       }
     } catch (_) {
-      // Konum adı alınamazsa mevcut değer korunur.
+      // Konum adı alınamazsa mevcut isim korunur.
     }
   }
 
@@ -192,573 +196,455 @@ class _WeatherStatusState extends State<WeatherStatus> {
     return 'Hava durumu';
   }
 
-  Widget _weatherVisual() {
-    final code = _weatherCode;
-
-    if (code == 0) {
-      return const _SunIcon();
-    }
-
-    if (code == 1 || code == 2) {
-      return const _PartlyCloudyIcon();
-    }
-
-    if (code == 3) {
-      return const _CloudIcon();
-    }
-
-    if (code == 45 || code == 48) {
-      return const _FogIcon();
-    }
-
-    if (code >= 51 && code <= 57) {
-      return const _DrizzleIcon();
-    }
-
-    if (code >= 61 && code <= 67) {
-      return const _RainIcon();
-    }
-
-    if (code >= 71 && code <= 77) {
-      return const _SnowIcon();
-    }
-
-    if (code >= 80 && code <= 82) {
-      return const _RainIcon();
-    }
-
-    if (code == 85 || code == 86) {
-      return const _SnowIcon();
-    }
-
-    if (code == 95 || code == 96 || code == 99) {
-      return const _StormIcon();
-    }
-
-    return const _CloudIcon();
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const SizedBox(
-        width: 300,
-        height: 150,
-        child: Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-            color: Color(0xFF00BFFF),
-          ),
-        ),
-      );
-    }
-
     return SizedBox(
       width: 330,
       height: 175,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 105,
-            height: 105,
-            child: _weatherVisual(),
-          ),
-          const SizedBox(width: 18),
-          Flexible(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _locationName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF00CFFF),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
+      child: _loading
+          ? const Center(
+              child: SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Color(0xFF00BFFF),
                 ),
-                const SizedBox(height: 5),
-                if (_temperature != null)
-                  Text(
-                    '${_temperature!.round()}°C',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.w500,
-                    ),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 8,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 92,
+                        height: 82,
+                        child: CustomPaint(
+                          painter: _WeatherPainter(
+                            code: _weatherCode,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _locationName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF00BFFF),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            if (_temperature != null)
+                              Text(
+                                '${_temperature!.round()}°C',
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            const SizedBox(height: 3),
+                            Text(
+                              _weatherText,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Color(0xFF00BFFF),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                const SizedBox(height: 2),
-                Text(
-                  _weatherText,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Color(0xFF00BFFF),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
     );
   }
 }
 
-class _SunIcon extends StatelessWidget {
-  const _SunIcon();
+class _WeatherPainter extends CustomPainter {
+  final int code;
 
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _SunPainter(),
-    );
-  }
-}
-
-class _PartlyCloudyIcon extends StatelessWidget {
-  const _PartlyCloudyIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _PartlyCloudyPainter(),
-    );
-  }
-}
-
-class _CloudIcon extends StatelessWidget {
-  const _CloudIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _CloudPainter(),
-    );
-  }
-}
-
-class _FogIcon extends StatelessWidget {
-  const _FogIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _FogPainter(),
-    );
-  }
-}
-
-class _DrizzleIcon extends StatelessWidget {
-  const _DrizzleIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _RainPainter(light: true),
-    );
-  }
-}
-
-class _RainIcon extends StatelessWidget {
-  const _RainIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _RainPainter(),
-    );
-  }
-}
-
-class _SnowIcon extends StatelessWidget {
-  const _SnowIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _SnowPainter(),
-    );
-  }
-}
-
-class _StormIcon extends StatelessWidget {
-  const _StormIcon();
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _StormPainter(),
-    );
-  }
-}
-
-class _SunPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(
-      size.width * 0.48,
-      size.height * 0.45,
-    );
-
-    final radius = size.width * 0.20;
-
-    final sunPaint = Paint()
-      ..color = const Color(0xFFFFC107)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(center, radius, sunPaint);
-
-    final rayPaint = Paint()
-      ..color = const Color(0xFFFFD54F)
-      ..strokeWidth = 5
-      ..strokeCap = StrokeCap.round;
-
-    for (int i = 0; i < 8; i++) {
-      final angle = i * 3.1415926535 / 4;
-
-      final start = Offset(
-        center.dx + radius * 1.45 * _cos(angle),
-        center.dy + radius * 1.45 * _sin(angle),
-      );
-
-      final end = Offset(
-        center.dx + radius * 2.05 * _cos(angle),
-        center.dy + radius * 2.05 * _sin(angle),
-      );
-
-      canvas.drawLine(start, end, rayPaint);
-    }
-  }
-
-  double _cos(double value) {
-    return _trig(value, true);
-  }
-
-  double _sin(double value) {
-    return _trig(value, false);
-  }
-
-  double _trig(double value, bool cosine) {
-    if (cosine) {
-      if (value == 0) return 1;
-      if (value == 1.57079632675) return 0;
-      if (value == 3.1415926535) return -1;
-      if (value == 4.71238898025) return 0;
-      return 0;
-    }
-
-    if (value == 0) return 0;
-    if (value == 1.57079632675) return 1;
-    if (value == 3.1415926535) return 0;
-    if (value == 4.71238898025) return -1;
-    return 0;
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
-class _CloudPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFB9D7E8)
-      ..style = PaintingStyle.fill;
-
-    final shadowPaint = Paint()
-      ..color = const Color(0xFF78909C)
-      ..style = PaintingStyle.fill;
-
-    final base = RRect.fromRectAndRadius(
-      Rect.fromLTWH(
-        size.width * 0.13,
-        size.height * 0.47,
-        size.width * 0.74,
-        size.height * 0.27,
-      ),
-      const Radius.circular(24),
-    );
-
-    canvas.drawRRect(base, shadowPaint);
-
-    canvas.drawCircle(
-      Offset(size.width * 0.38, size.height * 0.47),
-      size.width * 0.19,
-      paint,
-    );
-
-    canvas.drawCircle(
-      Offset(size.width * 0.58, size.height * 0.40),
-      size.width * 0.24,
-      paint,
-    );
-
-    canvas.drawCircle(
-      Offset(size.width * 0.72, size.height * 0.50),
-      size.width * 0.16,
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
-class _PartlyCloudyPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final sunCenter = Offset(
-      size.width * 0.35,
-      size.height * 0.34,
-    );
-
-    final sunPaint = Paint()
-      ..color = const Color(0xFFFFC107)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      sunCenter,
-      size.width * 0.18,
-      sunPaint,
-    );
-
-    final cloudPaint = Paint()
-      ..color = const Color(0xFFB9D7E8)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.53, size.height * 0.55),
-      size.width * 0.22,
-      cloudPaint,
-    );
-
-    canvas.drawCircle(
-      Offset(size.width * 0.70, size.height * 0.52),
-      size.width * 0.17,
-      cloudPaint,
-    );
-
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.28,
-          size.height * 0.53,
-          size.width * 0.58,
-          size.height * 0.22,
-        ),
-        const Radius.circular(20),
-      ),
-      cloudPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
-class _FogPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFB0BEC5)
-      ..strokeWidth = 7
-      ..strokeCap = StrokeCap.round;
-
-    for (int i = 0; i < 4; i++) {
-      final y = size.height * (0.30 + i * 0.14);
-
-      canvas.drawLine(
-        Offset(size.width * 0.18, y),
-        Offset(size.width * 0.82, y),
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
-class _RainPainter extends CustomPainter {
-  final bool light;
-
-  _RainPainter({
-    this.light = false,
+  _WeatherPainter({
+    required this.code,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final cloudPaint = Paint()
-      ..color = const Color(0xFF90A4AE)
+    final center = Offset(
+      size.width / 2,
+      size.height / 2,
+    );
+
+    final scale = math.min(
+      size.width / 92,
+      size.height / 82,
+    );
+
+    canvas.save();
+    canvas.translate(
+      center.dx,
+      center.dy,
+    );
+    canvas.scale(scale);
+
+    if (code == 0) {
+      _drawSunny(canvas);
+    } else if (code == 1 || code == 2) {
+      _drawPartlyCloudy(canvas);
+    } else if (code == 3) {
+      _drawCloudy(canvas);
+    } else if (code == 45 || code == 48) {
+      _drawFog(canvas);
+    } else if (code >= 51 && code <= 57) {
+      _drawRain(canvas, light: true);
+    } else if (code >= 61 && code <= 67) {
+      _drawRain(canvas);
+    } else if (code >= 71 && code <= 77) {
+      _drawSnow(canvas);
+    } else if (code >= 80 && code <= 82) {
+      _drawRain(canvas);
+    } else if (code == 85 || code == 86) {
+      _drawSnow(canvas);
+    } else if (code == 95 ||
+        code == 96 ||
+        code == 99) {
+      _drawStorm(canvas);
+    } else {
+      _drawCloudy(canvas);
+    }
+
+    canvas.restore();
+  }
+
+  void _drawSunny(Canvas canvas) {
+    final rayPaint = Paint()
+      ..color = const Color(0xFF00BFFF)
+      ..strokeWidth = 3
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    const radius = 19.0;
+
+    for (int i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4;
+
+      final start = Offset(
+        math.cos(angle) * 27,
+        math.sin(angle) * 27,
+      );
+
+      final end = Offset(
+        math.cos(angle) * 36,
+        math.sin(angle) * 36,
+      );
+
+      canvas.drawLine(
+        start,
+        end,
+        rayPaint,
+      );
+    }
+
+    final sunPaint = Paint()
+      ..color = const Color(0xFF00BFFF)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(
-      Offset(size.width * 0.42, size.height * 0.39),
-      size.width * 0.20,
+      Offset.zero,
+      radius,
+      sunPaint,
+    );
+
+    final innerPaint = Paint()
+      ..color = const Color(0xFF08131C)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(
+      Offset.zero,
+      radius - 6,
+      innerPaint,
+    );
+  }
+
+  void _drawPartlyCloudy(Canvas canvas) {
+    _drawSun(
+      canvas,
+      const Offset(-12, -13),
+    );
+
+    _drawCloud(
+      canvas,
+      Offset(9, 10),
+    );
+  }
+
+  void _drawCloudy(Canvas canvas) {
+    _drawCloud(
+      canvas,
+      Offset.zero,
+    );
+  }
+
+  void _drawCloud(
+    Canvas canvas, {
+    required Offset offset,
+  }) {
+    final cloudPaint = Paint()
+      ..color = const Color(0xFFB9D5E5)
+      ..style = PaintingStyle.fill;
+
+    final darkCloudPaint = Paint()
+      ..color = const Color(0xFF7894A3)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(
+      Offset(
+        offset.dx - 17,
+        offset.dy + 9,
+      ),
+      13,
+      darkCloudPaint,
+    );
+
+    canvas.drawCircle(
+      Offset(
+        offset.dx + 5,
+        offset.dy + 7,
+      ),
+      17,
       cloudPaint,
     );
 
     canvas.drawCircle(
-      Offset(size.width * 0.62, size.height * 0.38),
-      size.width * 0.22,
+      Offset(
+        offset.dx + 22,
+        offset.dy + 10,
+      ),
+      13,
       cloudPaint,
     );
 
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.20,
-          size.height * 0.43,
-          size.width * 0.63,
-          size.height * 0.25,
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(
+          offset.dx + 5,
+          offset.dy + 15,
         ),
-        const Radius.circular(20),
+        width: 62,
+        height: 25,
       ),
       cloudPaint,
     );
+  }
+
+  void _drawSun(
+    Canvas canvas,
+    Offset offset,
+  ) {
+    final paint = Paint()
+      ..color = const Color(0xFF00BFFF)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(
+      offset,
+      15,
+      paint,
+    );
+
+    final rayPaint = Paint()
+      ..color = const Color(0xFF00BFFF)
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+
+    for (int i = 0; i < 8; i++) {
+      final angle = i * math.pi / 4;
+
+      final start = Offset(
+        offset.dx + math.cos(angle) * 21,
+        offset.dy + math.sin(angle) * 21,
+      );
+
+      final end = Offset(
+        offset.dx + math.cos(angle) * 28,
+        offset.dy + math.sin(angle) * 28,
+      );
+
+      canvas.drawLine(
+        start,
+        end,
+        rayPaint,
+      );
+    }
+  }
+
+  void _drawRain(
+    Canvas canvas, {
+    bool light = false,
+  }) {
+    _drawCloud(
+      canvas,
+      Offset(0, -8),
+    );
 
     final rainPaint = Paint()
-      ..color = const Color(0xFF29B6F6)
-      ..strokeWidth = 5
+      ..color = const Color(0xFF00BFFF)
+      ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
 
     final count = light ? 3 : 4;
 
     for (int i = 0; i < count; i++) {
-      final x = size.width * (0.31 + i * 0.14);
+      final x = -24.0 + i * 16;
 
       canvas.drawLine(
-        Offset(x, size.height * 0.76),
-        Offset(x - 5, size.height * 0.91),
+        Offset(x, 22),
+        Offset(x - 5, 34),
         rainPaint,
       );
     }
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
-}
-
-class _SnowPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cloudPaint = Paint()
-      ..color = const Color(0xFF90A4AE)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.40, size.height * 0.38),
-      size.width * 0.20,
-      cloudPaint,
-    );
-
-    canvas.drawCircle(
-      Offset(size.width * 0.61, size.height * 0.38),
-      size.width * 0.22,
-      cloudPaint,
-    );
-
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.19,
-          size.height * 0.43,
-          size.width * 0.64,
-          size.height * 0.24,
-        ),
-        const Radius.circular(20),
-      ),
-      cloudPaint,
+  void _drawSnow(Canvas canvas) {
+    _drawCloud(
+      canvas,
+      Offset(0, -9),
     );
 
     final snowPaint = Paint()
-      ..color = const Color(0xFFE1F5FE)
-      ..style = PaintingStyle.fill;
+      ..color = Colors.white
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
 
-    final points = [
-      Offset(size.width * 0.34, size.height * 0.80),
-      Offset(size.width * 0.50, size.height * 0.87),
-      Offset(size.width * 0.66, size.height * 0.80),
-    ];
+    for (int i = 0; i < 3; i++) {
+      final x = -18.0 + i * 18;
+      final y = 27.0;
 
-    for (final point in points) {
-      canvas.drawCircle(point, 5, snowPaint);
+      canvas.drawLine(
+        Offset(x - 5, y),
+        Offset(x + 5, y),
+        snowPaint,
+      );
+
+      canvas.drawLine(
+        Offset(x, y - 5),
+        Offset(x, y + 5),
+        snowPaint,
+      );
+
+      canvas.drawLine(
+        Offset(x - 4, y - 4),
+        Offset(x + 4, y + 4),
+        snowPaint,
+      );
+
+      canvas.drawLine(
+        Offset(x - 4, y + 4),
+        Offset(x + 4, y - 4),
+        snowPaint,
+      );
     }
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+  void _drawFog(Canvas canvas) {
+    final paint = Paint()
+      ..color = const Color(0xFFB9D5E5)
+      ..strokeWidth = 4
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawLine(
+      const Offset(-30, -12),
+      const Offset(30, -12),
+      paint,
+    );
+
+    canvas.drawLine(
+      const Offset(-25, 0),
+      const Offset(35, 0),
+      paint,
+    );
+
+    canvas.drawLine(
+      const Offset(-32, 12),
+      const Offset(25, 12),
+      paint,
+    );
+
+    canvas.drawLine(
+      const Offset(-20, 24),
+      const Offset(32, 24),
+      paint,
+    );
   }
-}
 
-class _StormPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cloudPaint = Paint()
-      ..color = const Color(0xFF607D8B)
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.40, size.height * 0.35),
-      size.width * 0.21,
-      cloudPaint,
+  void _drawStorm(Canvas canvas) {
+    _drawCloud(
+      canvas,
+      Offset(0, -10),
     );
 
-    canvas.drawCircle(
-      Offset(size.width * 0.61, size.height * 0.36),
-      size.width * 0.23,
-      cloudPaint,
-    );
-
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.18,
-          size.height * 0.40,
-          size.width * 0.66,
-          size.height * 0.25,
-        ),
-        const Radius.circular(20),
-      ),
-      cloudPaint,
-    );
-
-    final lightning = Paint()
-      ..color = const Color(0xFFFFD740)
+    final lightningPaint = Paint()
+      ..color = const Color(0xFF00BFFF)
       ..style = PaintingStyle.fill;
 
     final path = Path()
-      ..moveTo(size.width * 0.53, size.height * 0.63)
-      ..lineTo(size.width * 0.40, size.height * 0.84)
-      ..lineTo(size.width * 0.52, size.height * 0.81)
-      ..lineTo(size.width * 0.45, size.height * 0.98)
-      ..lineTo(size.width * 0.68, size.height * 0.70)
-      ..lineTo(size.width * 0.55, size.height * 0.73)
+      ..moveTo(5, 16)
+      ..lineTo(-5, 16)
+      ..lineTo(-13, 31)
+      ..lineTo(-3, 29)
+      ..lineTo(-8, 43)
+      ..lineTo(9, 23)
+      ..lineTo(0, 25)
       ..close();
 
-    canvas.drawPath(path, lightning);
+    canvas.drawPath(
+      path,
+      lightningPaint,
+    );
+
+    final rainPaint = Paint()
+      ..color = const Color(0xFF00BFFF)
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawLine(
+      const Offset(-22, 25),
+      const Offset(-27, 35),
+      rainPaint,
+    );
+
+    canvas.drawLine(
+      const Offset(25, 25),
+      const Offset(20, 35),
+      rainPaint,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+  bool shouldRepaint(
+    covariant _WeatherPainter oldDelegate,
+  ) {
+    return oldDelegate.code != code;
   }
 }
